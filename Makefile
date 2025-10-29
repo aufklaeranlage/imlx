@@ -137,9 +137,10 @@ $(UNI):
 
 $(TEST_OBJ_DIR)/%.out: %.c
 	@$(DIR_DUP)
-	@$(CC) $(CFLAGS) $(TEST_CFLAGS) $(CPPFLAGS) $(TEST_CPPFLAGS) -o $@ $< $(OBJ) $(LDFLAGS) $(TEST_LDFLAGS)
+	$(CC) $(CFLAGS) $(TEST_CFLAGS) $(CPPFLAGS) $(TEST_CPPFLAGS) -o $@ $< $(OBJ) $(LDFLAGS) $(TEST_LDFLAGS)
 	@echo "Compiling '$@' with cflags '$(CFLAGS) $(TEST_CFLAGS)' and CPPFLAGS '$(CPPFLAGS) $(TEST_CPPFLAGS)'" 
-	./$@
+	$(TEST_PRE) ./$@
+	@$(RM) $@
 
 $(OBJ_DIR)/%.o: %.c
 	@$(DIR_DUP)
@@ -151,9 +152,11 @@ $(OBJ_DIR)/%.o: %.c
 clean:
 	@$(RM) $(OBJ_DIR)
 	@$(MAKE) -C $(MLX_DIR) clean > /dev/null
+	@echo "Deleting '$(OBJ_DIR)' and cleaning mlx"
 
 fclean: clean
 	@$(RM) $(NAME) $(DEPS)
+	@echo "Deleting library '$(NAME)'"
 
 re: fclean all
 

@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <string.h>
 
+static int	win_queue_dest(t_win *ptr);
+
 /*!	\fn bool add_win(t_session *s, int w, int h, const char *title)
  *	\brief Adds a new window to the session and updates internals.
  * 
@@ -28,6 +30,9 @@
  *	the window struct, adds the already existing windows to the new array as
  *	well as the new window, frees the old array and saves the new array in it's
  *	place.
+ *	
+ *	This function also creates a hook for the window to queue itself for
+ *	destructiion once it's close button is pressed.
  *
  * 	\returns A pointer to the new window on success, and NULL on failure.
  *
@@ -55,6 +60,7 @@ t_win	*add_win(t_session *s, int w, int h, const char *title) {
 	tmp->w = w;
 	tmp->h = h;
 	tmp->s = s;
+	tmp->destroy = false;
 	i = 0;
 	while (i < s->numwin)
 	{
@@ -65,6 +71,7 @@ t_win	*add_win(t_session *s, int w, int h, const char *title) {
 	++s->numwin;
 	free(s->win);
 	s->win = tmparr;
+	mlx_hook(tmp->ptr, ON_DESTROY, 0, win_queue_dest, tmp);
 	return (tmp);
 }
 
@@ -144,4 +151,9 @@ bool	win_dest(t_win *w) {
 	free(w->title);
 	free(w);
 	return (true);
+}
+
+static int	win_queue_dest(t_win *ptr) {
+	ptr->destroy = true;
+	return (0);
 }

@@ -14,6 +14,26 @@
 #  define SCR_H 500
 # endif
 
+// events
+#define ON_KEYDOWN 2
+#define ON_DESTROY 17
+#define KEY_PRESS_MASK 1 //(1L<<0)
+#define NO_EVENT_MASK 0 //0L
+
+// mouse
+#define MOUSE_LEFT 1
+#define MOUSE_MID 2
+#define MOUSE_RIGHT 3
+#define MOUSE_ZOOM_IN 4
+#define MOUSE_ZOOM_OUT 5
+
+// keys
+#define KEY_ESC 0xff1b
+#define KEY_LEFT 0xff51
+#define KEY_UP 0xff52
+#define KEY_RIGHT 0xff53
+#define KEY_DOWN 0xff54
+
 typedef struct s_win	t_win;
 
 typedef struct s_img	t_img;
@@ -29,6 +49,7 @@ typedef struct s_session {
 struct s_win {
 	char		*title;
 	void		*ptr;		/* window pointer returned by mlx_new_window */
+	bool		destroy;	/* internal flag if queued for clearing */
 	int			w;			/* width of a window (in pixels) */
 	int			h;			/* hieght of a window (in pixels) */
 	t_session	*s;			/* ease of use pointer to the associated session */
@@ -51,6 +72,8 @@ struct s_img {
 bool	session_init(t_session *s);
 
 bool	session_end(t_session *s);
+
+int		session_clean(t_session *s);
 
 /* Window handling */
 
