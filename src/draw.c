@@ -1,14 +1,6 @@
 #include "graphics.h"
 
-#include "tuple.h"
 #include "mlx.h"
-
-// Converts the x, y, and z values in t_tup 'a' to a int usable with the mlx
-// library.
-static int	tup2col(const t_tup *a) {
-	return ((fpt2i(a->x) * 255) << 16 |
-		(fpt2i(a->y) * 255) << 8 | (fpt2i(a->z) * 255));
-}
 
 static void	img_put_pxl(t_img *i, int x, int y, int color) {
 	char *dst;

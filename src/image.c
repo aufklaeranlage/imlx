@@ -1,45 +1,150 @@
 #include "graphics.h"
 
-#include "mlx.h"
-
 #include <stdlib.h>
 #include <stdbool.h>
 
-// Initializes a new image inside the t_scr struct 's'. Fails on a failed malloc
-// (check errno), an image already existing (check s->img not being NULL) or 's'
-// not having an associated window (check s->win being NULL).
-// Returns true on success and flase on error.
-bool	scr_img_new(t_scr *s) {
-	if (s->img != NULL || s->win == NULL)
-		return (false);
-	s->img = malloc(sizeof(t_img));
-	s->img->ptr = mlx_new_image(s->cid, s->win->w, s->win->h);
-	if (s->img->ptr == NULL)
-		return (free(s->img), s->img = NULL, false);
-	s->img->addr = mlx_get_data_addr(s->img->ptr, &s->img->bpp,
-		&s->img->linesize, &s->img->endian);
-	return (true);
-}
+/*!	\fn t_img *add_img(t_session *s, int w, int h, int id)
+ *	\brief Adds a new image to the session and updates internals.
+ * 
+ * 	\param s A pointer to the session the new image is supposed to be created
+ * 	for.
+ * 	\param w The width of the image.
+ * 	\param h The height of the image.
+ * 	\param id The id for the image.
+ *
+ * 	Checks if the session already has a image with the id \a id with
+ * 	get_img(). If a image with that id already exists returns NULL and does
+ * 	nothing.
+ *	Allocates space for a new t_img struct and an array of t_img structs as long
+ *	as the number of images associated with the session plus one to have room
+ *	for the new image. It also duplicates the title string 
+ *	If any of these allocations fail it will return NULL after freeing the
+ *	already allocated memory.
+ *	After the allocation it calles mlx_new_image() and saves the pointer in the
+ *	new t_img struct. If the call to mlx_new_image() fails it returns NULL
+ *	after freeing the already allocated memory().
+ *	After the succesfull call to mlx_new_image() it finishes initialization on
+ *	the image struct, adds the already existing images to the new array as
+ *	well as the new image, frees the old array and saves the new array in it's
+ *	place.
+ *
+ * 	\returns the pointer to the new image on success, and NULL on failure.
+ */
+t_img	*add_img(t_session *s, int w, int h, int id) {
+	t_img	*tmp;
+	t_img	**tmparr;
+	int		i;
 
-// Serves the image in 's' to the window in 's'.
-// Fails if the image or the window haven't been initialized yet (scr_win_new()
-// and scr_img_new() need to be called first).
-// Returns true on success and flase on error.
-bool	scr_serve(t_scr *s) {
-	if (s->img == NULL || s->win == NULL)
+	if (get_img(s, id))
 		return (false);
-	mlx_put_image_to_window(s->cid, s->win->ptr, s->img->ptr, 0, 0);
-	return (true);
-}
-
-// Destroys the image in 's'
-// Fails if no image is associated with 's'.
-// Returns true on success and false on failure.
-bool	scr_img_dest(t_scr *s) {
-	if (s->img == NULL)
-		return (false);
-	mlx_destroy_image(s->cid, s->img->ptr);
+	tmp = malloc(sizeof(*tmp));
+	tmparr = malloc((s->numimg + 1) * sizeof(*tmparr));
+	if (tmp == NULL || tmparr == NULL)
+		return (free(tmp), free(tmparr), false);
+	tmp->ptr = mlx_new_image(s->cid, w, h);
+	if (tmp->ptr == NULL)
+		return (free(tmp), free(tmparr), false);
+	tmp->id = id;
+	tmp->addr = mlx_get_data_addr(tmp->ptr, &tmp->bpp, &tmp->ls, &tmp->en);
+	i = 0;
+	while (i < s->numimg)
+	{
+		tmparr[i] = s->img[i];
+		++i;
+	}
+	tmparr[i] = tmp;
+	++s->numimg;
 	free(s->img);
-	s->img = NULL;
+	s->img = tmparr;
+	return (true);
+}
+
+/*!	\fn t_img *get_img(const t_session *s, int id)
+ * 	\brief Checks the session pointed to by \a s for a image with the id \a id.
+ *
+ * 	\param s A pointer to the t_session struct to be searched.
+ * 	\param id The id of the image to look for.
+ *
+ *	Iterates over the images inside the session and returns the one with a
+ *	matching id. If none is found it returns a NULL pointer.
+ *
+ *	\return A pointer to the t_img struct with a matching id if one could be
+ *	found or NULL if no matching t_img struct could be found.
+ */ 
+t_img	*get_img(const t_session *s, int id) {
+	int	i;
+
+	i = 0;
+	while (i < s->numimg)
+	{
+		if (id == s->img[i]->id)
+			return (s->img[i]);
+		++i;
+	}
+	return (NULL);
+}
+
+/*!	\fn bool put_img(t_img *i, t_win *w, int x, int y)
+ * 	\brief Puts an image to a window.
+ *
+ * 	\param i A pointer to the t_img struct that should be put to the window.
+ * 	\param w A pointer to the t_win struct that the image should be put onto.
+ * 	\param x The x offset the image should be put to.
+ * 	\param y The y offset the image should be put to.
+ *
+ *	Wrapped call to mlx_put_image_to_window().
+ *	The offsett assumes x = 0 and y = 0 to be the top right corner.
+ *
+ * 	\return At the moment always returns true
+ */
+bool	put_img(t_img *i, t_win *w, int x, int y) {
+	mlx_put_image_to_window(i->s, i->ptr, w->ptr, x, y);
+	return (true);
+}
+
+/*!	\fn bool img_clear(t_img *i)
+ * 	\brief Clears a image (set's it to black)
+ *
+ * 	\param i A pointer ot the t_img struct that should be cleared.
+ *
+ *	Iterates over the iamge and set's all it's pixels to 0x00000000 (black).
+ *
+ * 	\return At the moment always returns true
+ */
+bool	img_clear(t_img *i) {
+	return (true);
+}
+
+/*!	\fn bool img_dest(t_img *i)
+ * 	\brief Destroys a image and updates internals.
+ *
+ * 	\param i A pointer ot the t_img struct that should be destroyed.
+ *
+ *	Moves the images stored in the image array of the associated session
+ *	together, skipping the one pointed to by w. If the pointer \a w is not
+ *	present in the associated session returns false.
+ *	If the image is present it decreases the \a numwin variable for the
+ *	associated session and calls mlx_destroy_image() on the image, frees the
+ *	title string and the t_img struct itself.
+ *
+ * 	\return True on success, false on failure.
+ */
+bool	img_dest(t_img *i) {
+	int	j;
+
+	j = 0;
+	while (j < i->s->numimg && i->s->img[j] != i)
+		++i;
+	if (i == i->s->numimg)
+		return (false);
+	while (i + 1 < w->s->numimg)
+	{
+		i->s->img[j] = i->s->img[j + 1];
+		++j;
+	}
+	i->s->img[j] = NULL;
+	--i->s->numimg;
+	mlx_destroy_image(i->s->cid, i->ptr);
+	free(i);
 	return (true);
 }

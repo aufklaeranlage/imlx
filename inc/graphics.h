@@ -18,54 +18,58 @@ typedef struct s_win	t_win;
 
 typedef struct s_img	t_img;
 
-typedef struct s_scr {
-	void	*cid;			// connection id, returned by mlx_init
-	t_win	*win;
-	t_img	*img;
-}	t_scr;
+typedef struct s_session {
+	void	*cid;			/* connection id to the X server */
+	t_win	**win;			/* pointers to the associated window structs */
+	int		numwin;			/* amount of windows associated with this connection */
+	t_img	**img;			/* Pointers to the associated image structs */
+	int		numimg;			/* amount of images associated with this connection */
+}	t_session;
 
 struct s_win {
-	void	*ptr;			// window pointer returned by mlx_new_window
-	int		w;
-	int		h;
+	char		*title;
+	void		*ptr;		/* window pointer returned by mlx_new_window */
+	int			w;			/* width of a window (in pixels) */
+	int			h;			/* hieght of a window (in pixels) */
+	t_session	*s;			/* ease of use pointer to the associated session */
 };
 
 struct s_img {
-	void	*ptr;			// window pointer returned by mlx_new_window
-	void	*addr;
-	int		linesize;		// size a line takes up in memory in bytes
-	int		bpp;			// bytes per pixel
-	int		endian;			// 0 = little endian, 1 = big endian
+	int			id;
+	void		*ptr;		/* window pointer returned by mlx_new_window */
+	void		*addr;		/* address of the color array for the image */
+	int			linesize;	/* size a line takes up in memory in bytes */
+	int			bpp;		/* bytes per pixel */
+	int			endian;		/* 0 = little endian, 1 = big endian */
+	t_session	*s;			/* ease of use pointer to the associated session */
 };
 
-// Screen / session handling
+/* Screen / session handling */
 
-bool	scr_init(t_scr *s);
+bool	session_init(t_session *s);
 
-bool	scr_dest(t_scr *s);
+bool	session_end(t_session *s);
 
-// Window handling
+/* Window handling */
 
-bool	scr_win_new(t_scr *s, int w, int h, char *title);
+t_win	*add_win(t_session *s, int w, int h, const char *title);
 
-bool	scr_win_clear(t_scr *s);
+t_win	*get_win(t_session *s, const char *title);
 
-bool	scr_win_dest(t_scr *s);
+bool	win_clear(t_win *w);
 
-// Hooks
+bool	win_dest(t_win *w);
 
-int		stop_loop(int keycode, void *ptr);
+/* Image handling */
 
-// Image handling
+t_img	*add_img(t_scr *s, int w, int h, int id);
 
-bool	scr_img_new(t_scr *s);
+t_img	*get_img(const t_session *s, int id);
 
-bool	scr_serve(t_scr *s);
+bool	put_img(t_img *i, t_win *w, int x, int y);
 
-bool	scr_img_dest(t_scr *s);
+bool	img_clear(t_img *i);
 
-// Drawing
-
-void	scr_put_tup(t_scr *s, int x, int y, const t_tup *a);
+bool	img_dest(t_img *s);
 
 #endif
