@@ -5,18 +5,27 @@ OBJ_DIR		:= obj
 LIB_DIR		:= lib
 
 # files
-NAME		:= miniRT
+NAME		:= libimlx.a
 
 ## sources
 SRC	:=
+vpath %.c $(SRC_DIR)
+SRC += session.c
+SRC += window.c
+SRC += image.c
+SRC += draw.c
 
 ## objects
 OBJ		:= $(SRC:.c=.o)
 OBJ		:= $(addprefix $(OBJ_DIR)/, $(OBJ))
 
 ## libraries etc
-MLX_DIR := lib/minilibx-linux
-MLX		:= libmlx.a
+ifndef MLX_DIR
+	MLX_DIR := lib/mlx
+endif
+ifndef MLX
+	MLX		:= libmlx.a
+endif
 
 ## dependencies
 DEPS	:= $(OBJ:%.o=%.d)
@@ -45,24 +54,19 @@ CPPFLAGS	+= $(addprefix -I, $(INC_DIR))
 CPPFLAGS	+= $(addprefix -I, $(FPT_DIR))
 CPPFLAGS	+= $(addprefix -I, $(MLX_DIR))
 
-## ldflags
+## ldflags.gen
 LDFLAGS		:=
-LDFLAGS		+= $(addprefix -L, $(MLX_DIR))
-LDFLAGS		+= $(addprefix -l, mlx)
-LDFLAGS		+= $(addprefix -l, Xext)
-LDFLAGS		+= $(addprefix -l, X11)
 
 # testing
 ## directories
 TEST_DIR		:= test
 TEST_SRC_DIR	:= $(TEST_DIR)/src
 TEST_OBJ_DIR	:= $(TEST_DIR)/obj
-## Unity
-UNI			:= libunity.a
-UNI_DIR		:= test/Unity
 
 ## sources
 TEST_SRC	:=
+vpath %.c $(TEST_SRC_DIR)
+TEST_SRC	+= main.c
 
 ## objects
 TEST_OBJ	:= $(TEST_SRC:.c=.out)
@@ -70,8 +74,11 @@ TEST_OBJ	:= $(addprefix $(TEST_OBJ_DIR)/, $(TEST_OBJ))
 
 ## flags
 TEST_CPPFLAGS	+= $(addprefix -I, $(UNI_DIR)/src)
-TEST_LDFLAGS	+= $(addprefix -L, $(UNI_DIR))
-TEST_LDFLAGS	+= $(addprefix -l, unity)
+
+TEST_LDFLAGS	+= $(addprefix -L, $(MLX_DIR))
+TEST_LDFLAGS	+= $(addprefix -l, mlx)
+TEST_LDFLAGS	+= $(addprefix -l, Xext)
+TEST_LDFLAGS	+= $(addprefix -l, X11)
 
 ifndef DEBUG
 	CFLAGS += -O3
@@ -113,14 +120,13 @@ endif
 
 all: $(NAME)
 
-$(NAME): $(OBJ) $(MLX)
-	@$(LD) $(OBJ) -o $@ $(LDFLAGS)
-	@echo "Linking executable '$@' with LDFLAGS '$(LDFLAGS)'"
+$(NAME): $(OBJ)
+	@echo "Creating library '$@' from files '$(OBJ)'"
+	@$(AR) rcs $@ $(OBJ)
 
-test: $(UNI) $(MLX) $(OBJ) $(TEST_OBJ)
-	@$(RM) $(TEST_OBJ_DIR)
-	@$(MAKE) -C $(UNI_DIR) clean > /dev/null
+test: fclean $(MLX) $(OBJ) $(TEST_OBJ)
 	@$(MAKE) -C $(MLX_DIR) clean > /dev/null
+	@$(RM) $(TEST_OBJ_DIR)
 
 $(MLX):
 	@$(MAKE) -C $(MLX_DIR) > /dev/null
@@ -129,11 +135,11 @@ $(UNI):
 	@$(CMAKE) $(UNI_DIR) > /dev/null
 	@$(MAKE) -C $(UNI_DIR) > /dev/null
 
-$(TEST_OBJ_DIR)/%.out: $(TEST_SRC_DIR)/%.c
+$(TEST_OBJ_DIR)/%.out: %.c
 	@$(DIR_DUP)
-	@$(CC) $(OBJ) $(CFLAGS) $(TEST_CFLAGS) $(CPPFLAGS) $(TEST_CPPFLAGS) -o $@ $< $(LDFLAGS) $(TEST_LDFLAGS)
+	@$(CC) $(CFLAGS) $(TEST_CFLAGS) $(CPPFLAGS) $(TEST_CPPFLAGS) -o $@ $< $(OBJ) $(LDFLAGS) $(TEST_LDFLAGS)
+	@echo "Compiling '$@' with cflags '$(CFLAGS) $(TEST_CFLAGS)' and CPPFLAGS '$(CPPFLAGS) $(TEST_CPPFLAGS)'" 
 	./$@
-	@$(RM) $@
 
 $(OBJ_DIR)/%.o: %.c
 	@$(DIR_DUP)

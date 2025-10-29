@@ -1,4 +1,4 @@
-#include "graphics.h"
+#include "imlx.h"
 
 #include "mlx.h"
 
@@ -50,9 +50,9 @@ bool	session_init(t_session *s) {
  */
 bool	session_end(t_session *s) {
 	while (s->numwin)
-		win_destroy(s->win[0]);
+		win_dest(s->win[0]);
 	while (s->numimg)
-		win_destroy(s->img[0]);
+		img_dest(s->img[0]);
 	s->cid = NULL;
 	return (true);
 }

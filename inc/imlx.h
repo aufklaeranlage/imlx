@@ -1,10 +1,10 @@
-#ifndef GRAPHICS_H
-# define GRAPHICS_H
+#ifndef IMLX_H
+# define IMLX_H
 
 # include "mlx.h"
-# include "tuple.h"
 
 # include <stdbool.h>
+# include <stdint.h>
 
 # ifndef SCR_W
 #  define SCR_W 500
@@ -36,11 +36,13 @@ struct s_win {
 
 struct s_img {
 	int			id;
+	int			w;
+	int			h;
 	void		*ptr;		/* window pointer returned by mlx_new_window */
 	void		*addr;		/* address of the color array for the image */
-	int			linesize;	/* size a line takes up in memory in bytes */
+	int			ls;			/* size a line takes up in memory in bytes */
 	int			bpp;		/* bytes per pixel */
-	int			endian;		/* 0 = little endian, 1 = big endian */
+	int			en;			/* 0 = little endian, 1 = big endian */
 	t_session	*s;			/* ease of use pointer to the associated session */
 };
 
@@ -54,7 +56,7 @@ bool	session_end(t_session *s);
 
 t_win	*add_win(t_session *s, int w, int h, const char *title);
 
-t_win	*get_win(t_session *s, const char *title);
+t_win	*get_win(const t_session *s, const char *title);
 
 bool	win_clear(t_win *w);
 
@@ -62,7 +64,7 @@ bool	win_dest(t_win *w);
 
 /* Image handling */
 
-t_img	*add_img(t_scr *s, int w, int h, int id);
+t_img	*add_img(t_session *s, int w, int h, int id);
 
 t_img	*get_img(const t_session *s, int id);
 
@@ -71,5 +73,9 @@ bool	put_img(t_img *i, t_win *w, int x, int y);
 bool	img_clear(t_img *i);
 
 bool	img_dest(t_img *s);
+
+/* Drawing */
+
+void	put_pixel(t_img *i, int x, int y, uint32_t color);
 
 #endif

@@ -1,4 +1,4 @@
-#include "graphics.h"
+#include "imlx.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -49,7 +49,7 @@ t_win	*add_win(t_session *s, int w, int h, const char *title) {
 	tmp->title = strdup(title);
 	if (tmp->title == NULL)
 		return (free(tmp), free(tmparr), NULL);
-	tmp->ptr = mlx_new_window(s->cid, w, h, title);
+	tmp->ptr = mlx_new_window(s->cid, w, h, tmp->title);
 	if (tmp->ptr == NULL)
 		return (free(tmp->title), free(tmp), free(tmparr), NULL);
 	tmp->w = w;
@@ -65,7 +65,7 @@ t_win	*add_win(t_session *s, int w, int h, const char *title) {
 	++s->numwin;
 	free(s->win);
 	s->win = tmparr;
-	return (true);
+	return (tmp);
 }
 
 /*!	\fn t_win *get_win(const t_session *s, const char *title)
@@ -89,8 +89,11 @@ t_win	*get_win(const t_session *s, const char *title) {
 
 	i = 0;
 	while (i < s->numwin)
-		if (!strcmp(title, s->win[i++]->title))
+	{
+		if (!strcmp(title, s->win[i]->title))
 			return (s->win[i]);
+		++i;
+	}
 	return (NULL);
 }
 

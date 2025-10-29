@@ -1,4 +1,4 @@
-#include "graphics.h"
+#include "imlx.h"
 
 #include <stdlib.h>
 #include <stdbool.h>
@@ -36,16 +36,19 @@ t_img	*add_img(t_session *s, int w, int h, int id) {
 	int		i;
 
 	if (get_img(s, id))
-		return (false);
+		return (NULL);
 	tmp = malloc(sizeof(*tmp));
 	tmparr = malloc((s->numimg + 1) * sizeof(*tmparr));
 	if (tmp == NULL || tmparr == NULL)
-		return (free(tmp), free(tmparr), false);
+		return (free(tmp), free(tmparr), NULL);
 	tmp->ptr = mlx_new_image(s->cid, w, h);
 	if (tmp->ptr == NULL)
-		return (free(tmp), free(tmparr), false);
+		return (free(tmp), free(tmparr), NULL);
 	tmp->id = id;
 	tmp->addr = mlx_get_data_addr(tmp->ptr, &tmp->bpp, &tmp->ls, &tmp->en);
+	tmp->w = w;
+	tmp->h = h;
+	tmp->s = s;
 	i = 0;
 	while (i < s->numimg)
 	{
@@ -56,7 +59,7 @@ t_img	*add_img(t_session *s, int w, int h, int id) {
 	++s->numimg;
 	free(s->img);
 	s->img = tmparr;
-	return (true);
+	return (tmp);
 }
 
 /*!	\fn t_img *get_img(const t_session *s, int id)
@@ -98,7 +101,7 @@ t_img	*get_img(const t_session *s, int id) {
  * 	\return At the moment always returns true
  */
 bool	put_img(t_img *i, t_win *w, int x, int y) {
-	mlx_put_image_to_window(i->s, i->ptr, w->ptr, x, y);
+	mlx_put_image_to_window(i->s->cid, w->ptr, i->ptr, x, y);
 	return (true);
 }
 
@@ -112,6 +115,17 @@ bool	put_img(t_img *i, t_win *w, int x, int y) {
  * 	\return At the moment always returns true
  */
 bool	img_clear(t_img *i) {
+	int	j, k;
+
+	j = 0;
+	while (j < i->h) {
+		k = 0;
+		while (k < i->w) {
+			put_pixel(i, j, k, 0x00000000);
+			++k;
+		}
+		++j;
+	}
 	return (true);
 }
 
@@ -134,10 +148,10 @@ bool	img_dest(t_img *i) {
 
 	j = 0;
 	while (j < i->s->numimg && i->s->img[j] != i)
-		++i;
-	if (i == i->s->numimg)
+		++j;
+	if (j == i->s->numimg)
 		return (false);
-	while (i + 1 < w->s->numimg)
+	while (j + 1 < i->s->numimg)
 	{
 		i->s->img[j] = i->s->img[j + 1];
 		++j;
