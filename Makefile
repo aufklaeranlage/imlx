@@ -60,7 +60,7 @@ ifeq ($(DEBUG), 1)
 	CPPFLAGS += -g3
 endif
 
-ifeq ($(UB), 1)before
+ifeq ($(UB), 1)
 	CFLAGS += -O0
 	CFLAGS += -g3
 	CFLAGS += -fsanitize=undefined
