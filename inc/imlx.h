@@ -69,40 +69,42 @@ struct s_img {
 
 /* Screen / session handling */
 
-bool	session_init(t_session *s);
+bool		session_init(t_session *s);
 
-bool	session_end(t_session *s);
+bool		session_end(t_session *s);
 
-int		session_clean(t_session *s);
+int			session_clean(t_session *s);
 
 /* Window handling */
 
-t_win	*add_win(t_session *s, uint32_t w, uint32_t h, const char *title);
+t_win		*add_win(t_session *s, uint32_t w, uint32_t h, const char *title);
 
-t_win	*get_win(const t_session *s, const char *title);
+t_win		*get_win(const t_session *s, const char *title);
 
-bool	win_clear(t_win *w);
+bool		win_clear(t_win *w);
 
-bool	win_dest(t_win *w);
+bool		win_dest(t_win *w);
 
 /* Image handling */
 
-t_img	*add_img(t_session *s, uint32_t w, uint32_t h, int id);
+t_img		*add_img(t_session *s, uint32_t w, uint32_t h, int id);
 
-t_img	*get_img(const t_session *s, int id);
+t_img		*get_img(const t_session *s, int id);
 
-bool	put_img(t_img *i, t_win *w, uint32_t x, uint32_t y);
+bool		put_img(t_img *i, t_win *w, uint32_t x, uint32_t y);
 
-bool	img_clear(t_img *i);
+bool		img_clear(t_img *i);
 
-bool	img_dest(t_img *s);
+bool		img_dest(t_img *s);
 
 /* Drawing */
 
-void	put_pixel(t_img *i, uint32_t x, uint32_t y, uint32_t color);
+void		put_pixel(t_img *i, uint32_t x, uint32_t y, uint32_t color);
 
-/* PPM Covnersion */
+uint32_t	rgb2uint32(char r, char g, char b);
 
-bool	img_2ppm(t_img *img, const char *filename);
+/* PPM Conversion */
+
+bool		img_2ppm(t_img *img, const char *filename);
 
 #endif

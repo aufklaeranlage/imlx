@@ -26,3 +26,22 @@ void	put_pixel(t_img *i, uint32_t x, uint32_t y, uint32_t color) {
 	dst = i->addr + (y * i->ls + x * (i->bpp / 8));
 	*(uint32_t *)dst = color;
 }
+
+/*!	\fn uint32_t rgb2uint32(char r, char g, char b)
+ * 	\brief Converts the RGB values into a unified uint32_t that is supposed to
+ * 	\brief be used with the put_pixel function.
+ *
+ * 	Bitshifts red by 16 to the left, g by 8 and b by 0 and combines them into a
+ * 	single uin32_t.
+ *
+ * 	\return Returns the combined colors.
+ *
+ * 	\warning don't use negative character, left shifing them could result in
+ * 	undefined behavior.
+*/
+uint32_t	rgb2uint32(char r, char g, char b) {
+	uint32_t	colr;
+
+	colr = r << 16 | g << 8 | b;
+	return (colr);
+}

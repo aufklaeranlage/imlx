@@ -20,14 +20,6 @@ SRC += ppmconv.c
 OBJ		:= $(SRC:.c=.o)
 OBJ		:= $(addprefix $(OBJ_DIR)/, $(OBJ))
 
-## libraries etc
-ifndef MLX_DIR
-	MLX_DIR := lib/mlx
-endif
-ifndef MLX
-	MLX		:= libmlx.a
-endif
-
 ## dependencies
 DEPS	:= $(OBJ:%.o=%.d)
 
@@ -52,35 +44,9 @@ CPPFLAGS	:=
 CPPFLAGS	+= -MMD
 CPPFLAGS	+= -MP
 CPPFLAGS	+= $(addprefix -I, $(INC_DIR))
-CPPFLAGS	+= $(addprefix -I, $(FPT_DIR))
-CPPFLAGS	+= $(addprefix -I, $(MLX_DIR))
 
 ## ldflags.gen
 LDFLAGS		:=
-
-# testing
-## directories
-TEST_DIR		:= test
-TEST_SRC_DIR	:= $(TEST_DIR)/src
-TEST_OBJ_DIR	:= $(TEST_DIR)/obj
-
-## sources
-TEST_SRC	:=
-vpath %.c $(TEST_SRC_DIR)
-# TEST_SRC	+= multiple_windows.c
-# TEST_SRC	+= ppm_conv.c
-
-## objectTEST_SRC	+= ppm_conv.c
-TEST_OBJ	:= $(TEST_SRC:.c=.out)
-TEST_OBJ	:= $(addprefix $(TEST_OBJ_DIR)/, $(TEST_OBJ))
-
-## flags
-TEST_CPPFLAGS	+= $(addprefix -I, $(UNI_DIR)/src)
-
-TEST_LDFLAGS	+= $(addprefix -L, $(MLX_DIR))
-TEST_LDFLAGS	+= $(addprefix -l, mlx)
-TEST_LDFLAGS	+= $(addprefix -l, Xext)
-TEST_LDFLAGS	+= $(addprefix -l, X11)
 
 ifndef DEBUG
 	CFLAGS += -O3
@@ -88,7 +54,7 @@ else
 	CFLAGS += -O0
 endif
 
-## conditional flagsbe
+## conditional flags
 ifeq ($(DEBUG), 1)
 	CFLAGS += -g3
 	CPPFLAGS += -g3
@@ -126,24 +92,6 @@ $(NAME): $(OBJ)
 	@echo "Creating library '$@' from files '$(OBJ)'"
 	@$(AR) rcs $@ $(OBJ)
 
-test: fclean $(MLX) $(OBJ) $(TEST_OBJ)
-	@$(MAKE) -C $(MLX_DIR) clean > /dev/null
-	@$(RM) $(TEST_OBJ_DIR)
-
-$(MLX):
-	@$(MAKE) -C $(MLX_DIR) > /dev/null
-
-$(UNI):
-	@$(CMAKE) $(UNI_DIR) > /dev/null
-	@$(MAKE) -C $(UNI_DIR) > /dev/null
-
-$(TEST_OBJ_DIR)/%.out: %.c
-	@$(DIR_DUP)
-	$(CC) $(CFLAGS) $(TEST_CFLAGS) $(CPPFLAGS) $(TEST_CPPFLAGS) -o $@ $< $(OBJ) $(LDFLAGS) $(TEST_LDFLAGS)
-	@echo "Compiling '$@' with cflags '$(CFLAGS) $(TEST_CFLAGS)' and CPPFLAGS '$(CPPFLAGS) $(TEST_CPPFLAGS)'" 
-	$(TEST_PRE) ./$@
-	@$(RM) $@
-
 $(OBJ_DIR)/%.o: %.c
 	@$(DIR_DUP)
 	@$(CC) $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
@@ -153,7 +101,6 @@ $(OBJ_DIR)/%.o: %.c
 
 clean:
 	@$(RM) $(OBJ_DIR)
-	@$(MAKE) -C $(MLX_DIR) clean > /dev/null
 	@echo "Deleting '$(OBJ_DIR)' and cleaning mlx"
 
 fclean: clean
@@ -162,7 +109,4 @@ fclean: clean
 
 re: fclean all
 
-run: re
-	./$(NAME)
-
-.PHONY: clean fclean re run
+.PHONY: clean fclean re
