@@ -5,7 +5,7 @@
 
 static void	paint_the_sky(t_img *img);
 
-static int	loop(vodi *);
+static int	loop(void *);
 
 int main(void) {
 	/* That was a nice image right? Almost looke like a starry sky, but we only
@@ -42,7 +42,7 @@ int main(void) {
 	 * pointer to the data it should use. In our case we want to pass it a
 	 * pointer to our session struct.
 	*/
-	mlx_loop_hook(loop, &s);
+	mlx_loop_hook(s.cid, loop, &s);
 	/*
 	 * mlx_loop takes a single argument and the is the X Session that is stored
 	 * inside our session struct. Simply pass the cid variable inside it to
@@ -94,4 +94,5 @@ static int loop(void *ptr) {
 	 * this and stops the loop itself. More on this later.
 	*/
 	session_clean(s);
+	return (0);
 }
