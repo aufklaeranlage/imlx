@@ -40,10 +40,10 @@ static int	win_queue_dest(t_win *ptr);
  * 	\warning to get_win() which uses strcmp() and is copied for the t_win struct
  * 	\warnign with strdup().
  */
-t_win	*add_win(t_session *s, int w, int h, const char *title) {
-	t_win	*tmp;
-	t_win	**tmparr;
-	int		i;
+t_win	*add_win(t_session *s, uint32_t w, uint32_t h, const char *title) {
+	t_win		*tmp;
+	t_win		**tmparr;
+	uint32_t	i;
 
 	if (get_win(s, title))
 		return (NULL);
@@ -92,7 +92,7 @@ t_win	*add_win(t_session *s, int w, int h, const char *title) {
  * 	string is given as the title this is likely to segfault.
  */ 
 t_win	*get_win(const t_session *s, const char *title) {
-	int	i;
+	uint32_t	i;
 
 	i = 0;
 	while (i < s->numwin)
@@ -133,7 +133,7 @@ bool	win_clear(t_win *w) {
  * 	\return True on success, false on failure.
  */
 bool	win_dest(t_win *w) {
-	int	i;
+	uint32_t	i;
 
 	i = 0;
 	while (i < w->s->numwin && w->s->win[i] != w)

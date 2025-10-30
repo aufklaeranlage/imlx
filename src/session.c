@@ -80,7 +80,7 @@ bool	session_end(t_session *s) {
  * 	\return At the moment always returns true.
  */
 int	session_clean(t_session *s) {
-	int	i;
+	uint32_t	i;
 
 	i = 0;
 	while (i < s->numwin)

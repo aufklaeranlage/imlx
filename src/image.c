@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-/*!	\fn t_img *add_img(t_session *s, int w, int h, int id)
+/*!	\fn t_img *add_img(t_session *s, uint32_t w, uint32_t h, int id)
  *	\brief Adds a new image to the session and updates internals.
  * 
  * 	\param s A pointer to the session the new image is supposed to be created
@@ -30,10 +30,10 @@
  *
  * 	\returns the pointer to the new image on success, and NULL on failure.
  */
-t_img	*add_img(t_session *s, int w, int h, int id) {
-	t_img	*tmp;
-	t_img	**tmparr;
-	int		i;
+t_img	*add_img(t_session *s, uint32_t w, uint32_t h, int id) {
+	t_img		*tmp;
+	t_img		**tmparr;
+	uint32_t	i;
 
 	if (get_img(s, id))
 		return (NULL);
@@ -75,7 +75,7 @@ t_img	*add_img(t_session *s, int w, int h, int id) {
  *	found or NULL if no matching t_img struct could be found.
  */ 
 t_img	*get_img(const t_session *s, int id) {
-	int	i;
+	uint32_t	i;
 
 	i = 0;
 	while (i < s->numimg)
@@ -100,7 +100,7 @@ t_img	*get_img(const t_session *s, int id) {
  *
  * 	\return At the moment always returns true
  */
-bool	put_img(t_img *i, t_win *w, int x, int y) {
+bool	put_img(t_img *i, t_win *w, uint32_t x, uint32_t y) {
 	mlx_put_image_to_window(i->s->cid, w->ptr, i->ptr, x, y);
 	return (true);
 }
@@ -115,7 +115,7 @@ bool	put_img(t_img *i, t_win *w, int x, int y) {
  * 	\return At the moment always returns true
  */
 bool	img_clear(t_img *i) {
-	int	j, k;
+	uint32_t	j, k;
 
 	j = 0;
 	while (j < i->h) {
@@ -144,7 +144,7 @@ bool	img_clear(t_img *i) {
  * 	\return True on success, false on failure.
  */
 bool	img_dest(t_img *i) {
-	int	j;
+	uint32_t	j;
 
 	j = 0;
 	while (j < i->s->numimg && i->s->img[j] != i)

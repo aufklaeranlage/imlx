@@ -39,26 +39,26 @@ typedef struct s_win	t_win;
 typedef struct s_img	t_img;
 
 typedef struct s_session {
-	void	*cid;			/* connection id to the X server */
-	t_win	**win;			/* pointers to the associated window structs */
-	int		numwin;			/* amount of windows associated with this connection */
-	t_img	**img;			/* Pointers to the associated image structs */
-	int		numimg;			/* amount of images associated with this connection */
+	void		*cid;		/* connection id to the X server */
+	t_win		**win;		/* pointers to the associated window structs */
+	uint32_t	numwin;		/* amount of windows associated with this connection */
+	t_img		**img;		/* Pointers to the associated image structs */
+	uint32_t	numimg;		/* amount of images associated with this connection */
 }	t_session;
 
 struct s_win {
 	char		*title;
 	void		*ptr;		/* window pointer returned by mlx_new_window */
 	bool		destroy;	/* internal flag if queued for clearing */
-	int			w;			/* width of a window (in pixels) */
-	int			h;			/* hieght of a window (in pixels) */
+	uint32_t	w;			/* width of a window (in pixels) */
+	uint32_t	h;			/* hieght of a window (in pixels) */
 	t_session	*s;			/* ease of use pointer to the associated session */
 };
 
 struct s_img {
 	int			id;
-	int			w;
-	int			h;
+	uint32_t	w;			/* width of a image (in pixels) */
+	uint32_t	h;			/* hieght of a image (in pixels) */
 	void		*ptr;		/* window pointer returned by mlx_new_window */
 	void		*addr;		/* address of the color array for the image */
 	int			ls;			/* size a line takes up in memory in bytes */
@@ -77,7 +77,7 @@ int		session_clean(t_session *s);
 
 /* Window handling */
 
-t_win	*add_win(t_session *s, int w, int h, const char *title);
+t_win	*add_win(t_session *s, uint32_t w, uint32_t h, const char *title);
 
 t_win	*get_win(const t_session *s, const char *title);
 
@@ -87,11 +87,11 @@ bool	win_dest(t_win *w);
 
 /* Image handling */
 
-t_img	*add_img(t_session *s, int w, int h, int id);
+t_img	*add_img(t_session *s, uint32_t w, uint32_t h, int id);
 
 t_img	*get_img(const t_session *s, int id);
 
-bool	put_img(t_img *i, t_win *w, int x, int y);
+bool	put_img(t_img *i, t_win *w, uint32_t x, uint32_t y);
 
 bool	img_clear(t_img *i);
 
@@ -99,6 +99,10 @@ bool	img_dest(t_img *s);
 
 /* Drawing */
 
-void	put_pixel(t_img *i, int x, int y, uint32_t color);
+void	put_pixel(t_img *i, uint32_t x, uint32_t y, uint32_t color);
+
+/* PPM Covnersion */
+
+bool	img_2ppm(t_img *img, const char *filename);
 
 #endif

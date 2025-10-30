@@ -14,6 +14,7 @@ SRC += session.c
 SRC += window.c
 SRC += image.c
 SRC += draw.c
+SRC += ppmconv.c
 
 ## objects
 OBJ		:= $(SRC:.c=.o)
@@ -66,9 +67,10 @@ TEST_OBJ_DIR	:= $(TEST_DIR)/obj
 ## sources
 TEST_SRC	:=
 vpath %.c $(TEST_SRC_DIR)
-TEST_SRC	+= main.c
+# TEST_SRC	+= multiple_windows.c
+# TEST_SRC	+= ppm_conv.c
 
-## objects
+## objectTEST_SRC	+= ppm_conv.c
 TEST_OBJ	:= $(TEST_SRC:.c=.out)
 TEST_OBJ	:= $(addprefix $(TEST_OBJ_DIR)/, $(TEST_OBJ))
 

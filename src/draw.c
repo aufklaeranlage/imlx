@@ -20,7 +20,7 @@
  *	can check that as needed by comparing x and y to 0 and the repective limit
  *	of the image (\a x < i->w and \a y < i->h).
  */ 
-void	put_pixel(t_img *i, int x, int y, uint32_t color) {
+void	put_pixel(t_img *i, uint32_t x, uint32_t y, uint32_t color) {
 	char *dst;
 
 	dst = i->addr + (y * i->ls + x * (i->bpp / 8));
